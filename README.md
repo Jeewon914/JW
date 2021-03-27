@@ -91,6 +91,40 @@ href : 링크로 연결된 목적지 주소
 2) 순서 있는 목록 (ol)
 3) 설명 목록 
 
-ul, ol 목록에서 중첩(nested) 형태로 사용할 경우, 포함 관계를 주의할 것
+  ul, ol 목록에서 중첩(nested) 형태로 사용할 경우, 포함 관계를 주의할 것
 - 포함하는 목록 항목에 작은 목록 전체가 포함됨
 
+### 이미지 콘텐츠 요소
+
+[HTML images](https://www.w3schools.com/html/html_images.asp)
+
+1) src attribute : 가져올 이미지 파일 위치 정보
+2) alt(alternative) attribute : 대체 텍스트
+
+### 멀티 미디어 콘텐츠 요소
+
+[HTML Video](https://www.w3schools.com/html/html5_video.asp)
+
+attribute 형태
+1) name = "value"
+2) name 만 사용
+
+viedo 태그의 attribute
+1) controls
+2) autoplay
+3) muted
+4) loop
+
+[HTML YouTube video](https://www.w3schools.com/html/html_youtube.asp)
+
+Youtube의 매개변수
+1) controls => youtube_url/VIDEO_ID?controls=1
+2) autoplay => youtube_url/VIDEO_ID?autoplay=1
+3) mute => youtube_url/VIDEO_ID?mute=1
+4) loop => youtube_url/VIDEO_ID?loop=1&playlist=VIDEO_ID
+
+여러 매개변수 동시 사용 경우
+youtube_url/VIDEO_ID?controls=1&autoplay=1&mute=1&loop=1&playlist=VIDEO_ID (& : ampersand)
+
+
+ministori-yonsei
