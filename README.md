@@ -57,7 +57,7 @@ HTML 속성(Attributes)
 > [HTML Headings](https://www.w3schools.com/html/html_headings.asp)
 
 제목 태그(tag)
-Headings -> h
+Headings -> h<br/>
 H1 ~ H6
 
 > [HTML Paragraphs](https://www.w3schools.com/html/html_paragraphs.asp)
