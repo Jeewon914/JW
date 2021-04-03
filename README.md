@@ -96,14 +96,14 @@ href : 링크로 연결된 목적지 주소
 
 ### 이미지 콘텐츠 요소
 
-[HTML images](https://www.w3schools.com/html/html_images.asp)
+> [HTML images](https://www.w3schools.com/html/html_images.asp)
 
 1) src attribute : 가져올 이미지 파일 위치 정보
 2) alt(alternative) attribute : 대체 텍스트
 
 ### 멀티 미디어 콘텐츠 요소
 
-[HTML Video](https://www.w3schools.com/html/html5_video.asp)
+> [HTML Video](https://www.w3schools.com/html/html5_video.asp)
 
 attribute 형태
 1) name = "value"
@@ -115,7 +115,7 @@ viedo 태그의 attribute
 3) muted
 4) loop
 
-[HTML YouTube video](https://www.w3schools.com/html/html_youtube.asp)
+> [HTML YouTube video](https://www.w3schools.com/html/html_youtube.asp)
 
 Youtube의 매개변수
 1) controls => youtube_url/VIDEO_ID?controls=1
@@ -126,5 +126,21 @@ Youtube의 매개변수
 여러 매개변수 동시 사용 경우
 youtube_url/VIDEO_ID?controls=1&autoplay=1&mute=1&loop=1&playlist=VIDEO_ID (& : ampersand)
 
+### HTML5 Content Model
+: Sectioning Contents
+=> Semantic Element
 
+> [HTML Semantic Elements](https://www.w3schools.com/html/html5_semantic_elements.asp)
+
+1) 특정 의미를 부여해준 Container 요소
+2) 레이아웃을 구성할 때 각각의 영역을 구분하기 위해 사용
+
+> 참고 링크
+
+- [Can I use](https://caniuse.com/)
+- [Photopea](https://www.photopea.com/)
+- [Website Template](https://freebiesbug.com/psd-freebies/piroll-design-template-agencypersonal-portfolio/)
+
+
+<hr>
 ministori-yonsei
