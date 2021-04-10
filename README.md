@@ -166,6 +166,52 @@ youtube_url/VIDEO_ID?controls=1&autoplay=1&mute=1&loop=1&playlist=VIDEO_ID (& : 
   - inline : inline, contents(text) 만 포함 가능
   - 예외 : inline 요소인 a 태그는 모두 포함 가능
 
+### Form 요소
+
+- 사용자 입력을 받을 수 있는 요소
+
+> [HTML FORM Element](https://www.w3schools.com/html/html_form_elements.asp)
+
+> 텍스트 입력 form 요소 (text / textarea / password)
+
+```
+<input type="text" /> : 한줄 입력
+<textarea></textarea> : 여러줄 입력 가능
+<input type="password" /> : 한줄 입력, 입력 내용이 기호로 표시됨
+```
+
+> 파일 업로드 form 요소 (file)
+
+```
+<input type="file" />
+```
+
+> 선택 form 요소 (radio / checkbox / select)
+
+```
+<input type="radio" />
+<input type="checkbox" />
+<select>
+  <option></option> : 목록 항목 표시
+</select>
+ ```
+   
+> 실행 form 요소 (button / reset / submit)
+
+```
+<input type="button" />
+<input type="reset" />
+<input type="submit" />
+<button type="button"></button>
+<button type="reset"></button>
+<button type="submit"></button>
+
+
+
+
+
+
+
 
 
 <hr>
