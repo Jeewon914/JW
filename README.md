@@ -207,9 +207,241 @@ youtube_url/VIDEO_ID?controls=1&autoplay=1&mute=1&loop=1&playlist=VIDEO_ID (& : 
 <button type="submit"></button>
 ```
 
+### HTML Element에 이름 붙이는 방법
+
+> id 와 class를 사용
+```
+<p id="paragraph1">단락</p>
+<p class="paragraph2">단락</p>
+```
+
+> id 와 class의 차이
+
+- id는 하나의 HTML파일(문서)에서 중복으로 사용할 수 없음
+- class는 하나의 HTML파일(문서)에서 중복으로 사용할 수 있음 (CSS styling, Javastript 기능을 동시 적용)
+- 프론트앤드에서는 class사용할 것을 추천 (조금 더 자유롭게 사용가능)
+
+> 표기법 (여러 단어가 사용될 경우 단어를 구분할때 사용)
+- gnb-list-item : kebab case
+- gnb_list_item : snake case
+- gnbListItem : camel case
+- GnbListItem : pascal case
+
+- 파일, 폴더 이름 : snake case
+- id, class : kebab case
+- 자바스크립트 변수, 함수 :camel case
+
+### 박스 가로 배치
+
+> float
+
+- left, right 속성값으로 가로 배치
+- 부모요소를 기준으로 왼쪽 배치, 오른쪽 배치가 됨 (나란히 사용할 경우, 동일한 요소를 사용할것)
+택 form 요소 (radio / checkbox / select)
+
+190
 
 
 
+191
+
+```
+
+192
+
+<input type="radio" />
+
+193
+
+<input type="checkbox" />
+
+194
+
+<select>
+
+195
+
+  <option></option> : 목록 항목 표시
+
+196
+
+</select>
+
+197
+
+ ```
+
+198
+
+   
+
+199
+
+> 실행 form 요소 (button / reset / submit)
+
+200
+
+
+
+201
+
+```
+
+202
+
+<input type="button" />
+
+203
+
+<input type="reset" />
+
+204
+
+<input type="submit" />
+
+205
+
+<button type="button"></button>
+
+206
+
+<button type="reset"></button>
+
+207
+
+<button type="submit"></button>
+
+208
+
+```
+
+209
+
+
+
+210
+
+### HTML Element에 이름 붙이는 방법
+
+211
+
+
+
+212
+
+> id 와 class를 사용
+
+213
+
+```
+
+214
+
+<p id="paragraph1">단락</p>
+
+215
+
+<p class="paragraph2">단락</p>
+
+216
+
+```
+
+217
+
+
+
+218
+
+> id 와 class의 차이
+
+219
+
+
+
+220
+
+- id는 하나의 HTML파일(문서)에서 중복으로 사용할 수 없음
+
+221
+
+- class는 하나의 HTML파일(문서)에서 중복으로 사용할 수 있음 (CSS styling, Javastript 기능을 동시 적용)
+
+222
+
+- 프론트앤드에서는 class사용할 것을 추천 (조금 더 자유롭게 사용가능)
+
+223
+
+
+
+224
+
+> 표기법 (여러 단어가 사용될 경우 단어를 구분할때 사용)
+
+225
+
+- gnb-list-item : kebab case
+
+226
+
+- gnb_list_item : snake case
+
+227
+
+- gnbListItem : camel case
+
+228
+
+- GnbListItem : pascal case
+
+229
+
+
+
+230
+
+- 파일, 폴더 이름 : snake case
+
+231
+
+- id, class : kebab case
+
+232
+
+- 자바스크립트 변수, 함수 :camel case
+
+233
+
+
+
+234
+
+### 박스 가로 배치
+
+235
+
+
+
+236
+
+> float
+
+237
+
+
+
+238
+
+- left, right 속성값으로 가로 배치
+
+239
+
+- 부모요소를 기준으로 왼쪽 배치, 오른쪽 배치가 됨 (나란히 사용할 경우, 동일한 요소를 사용할것)
+
+240
+
+- right 값을 사용할 경우, 박스 순서가 반대로 배치 됨- right 값을 사용할 경우, 박스 순서가 반대로 배치 됨
 
 
 
