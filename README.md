@@ -239,6 +239,11 @@ youtube_url/VIDEO_ID?controls=1&autoplay=1&mute=1&loop=1&playlist=VIDEO_ID (& : 
 - 부모요소를 기준으로 왼쪽 배치, 오른쪽 배치가 됨 (나란히 사용할 경우, 동일한 요소를 사용할것)
 - right 값을 사용할 경우, 박스 순서가 반대로 배치 됨- right 값을 사용할 경우, 박스 순서가 반대로 배치 됨
 
+### 반응형 웹
+
+> OSMU(One Source Multi Use) - On Source => HTML
+> 적응형 웹(Adaptive Web) : OSMU가 적용되지 않음 (HTML이 여러개) 
+
 
 <hr>
 ministori-yonsei
