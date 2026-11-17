@@ -478,7 +478,7 @@ input[type=checkbox]{width:auto}
   var CFG=window.SALE_CONFIG||{};
   function staticStore(){
     return { mode:"static",
-      load:function(){ return fetch("events.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); }).then(function(j){ events=(j.events||[]).slice(); setStatus(true,"정적 데이터 · 행사 "+events.length+"건 · 갱신 "+String(j.exportedAt||"").slice(0,10)); renderAll(); }); },
+      load:function(){ var src=window.SALE_INLINE?Promise.resolve(window.SALE_INLINE):fetch("events.json",{cache:"no-store"}).then(function(r){ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); }); return src.then(function(j){ events=(j.events||[]).slice(); setStatus(true,"정적 데이터 · 행사 "+events.length+"건 · 갱신 "+String(j.exportedAt||"").slice(0,10)); renderAll(); }); },
       set:function(){ return Promise.reject(new Error("read-only")); }, del:function(){ return Promise.reject(new Error("read-only")); } };
   }
   function supabaseStore(){
