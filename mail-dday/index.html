@@ -60,7 +60,9 @@ function render(d){
   document.getElementById('events').innerHTML=E.length?E.map(e=>{const on=new Date(e.start)<=now;const dd=on?{label:'진행 중',cls:'later'}:dday(e.start);
     return card(dd,e.platform,e.title,`${fmt(e.start)} ~ ${fmt(e.end)}`)}).join(''):'<div class="empty">예정된 기획전이 없습니다.</div>';
 }
-fetch('data.json?t='+Date.now()).then(r=>r.json()).then(render).catch(()=>{document.getElementById('meta').textContent='데이터를 불러오지 못했습니다.'});
+const RAW='https://raw.githubusercontent.com/Jeewon914/JW/mail-dday-data/mail-dday/data.json';
+const get=u=>fetch(u+'?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()});
+get(RAW).catch(()=>get('data.json')).then(render).catch(()=>{document.getElementById('meta').textContent='데이터를 불러오지 못했습니다.'});
 </script>
 </body>
 </html>
