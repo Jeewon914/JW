@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>강김조 세금 캘린더</title>
+<meta name="description" content="(주)강김조 세금 신고·납부 기한 캘린더">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#f3f4f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12151b" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="세금 캘린더">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* layout: 왼쪽에 14개월 미니 달력 격자, 오른쪽에 고정된 상세 패널. 좁은 화면에서는 세로로 쌓임 */
+:root{
+  --bg:#f3f4f7; --surface:#ffffff; --ink:#1b2330; --muted:#647084; --line:#dfe3ea; --accent:#22304a;
+  --tint:#eef1f6; --danger:#c0392b;
+  --c-wht:#2b66d0; --c-vat:#d07a08; --c-corp:#c43d32; --c-local:#1d8a50; --c-report:#7a4cc2; --c-etc:#6a7686; --c-check:#0c8c98;
+  --font:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#12151b; --surface:#1b2029; --ink:#e8ebf1; --muted:#98a2b3; --line:#2e3542; --accent:#dfe6f3;
+    --tint:#242b37; --danger:#ef7b6f;
+    --c-wht:#6c9cf2; --c-vat:#eda33a; --c-corp:#ef7b6f; --c-local:#4fc084; --c-report:#ab86ea; --c-etc:#9aa5b5; --c-check:#3fc0cb;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#12151b; --surface:#1b2029; --ink:#e8ebf1; --muted:#98a2b3; --line:#2e3542; --accent:#dfe6f3;
+  --tint:#242b37; --danger:#ef7b6f;
+  --c-wht:#6c9cf2; --c-vat:#eda33a; --c-corp:#ef7b6f; --c-local:#4fc084; --c-report:#ab86ea; --c-etc:#9aa5b5; --c-check:#3fc0cb;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;font-variant-numeric:tabular-nums}
+.wrap{max-width:1240px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+h1{font-size:20px;font-weight:700;margin:0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+.next{background:var(--accent);color:var(--bg);border:0;border-radius:10px;padding:8px 14px;font:inherit;text-align:left;cursor:pointer;display:flex;gap:12px;align-items:center}
+.next b{font-size:18px;font-weight:700}
+.next span{font-size:12.5px;opacity:.85;display:block}
+.next:focus-visible,.day:focus-visible,.up:focus-visible{outline:2px solid var(--c-wht);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.legend .dash{border:1.5px dashed var(--muted);background:none}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:16px;align-items:start}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(176px,1fr));gap:10px}
+.month{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 8px 6px}
+.month h2{font-size:12.5px;font-weight:600;margin:0 2px 4px;display:flex;justify-content:space-between}
+.month h2 small{font-weight:400;color:var(--muted);font-size:11px}
+.grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px}
+.dow{font-size:9.5px;color:var(--muted);text-align:center;padding-bottom:2px}
+.cell,.day{height:27px;border-radius:6px;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:2px;color:var(--ink)}
+.cell.off{color:var(--danger);opacity:.75}
+.cell.past,.day.past{opacity:.42}
+.day{border:0;background:var(--tint);font:inherit;font-size:11px;font-weight:700;cursor:pointer;position:relative}
+.day:hover{box-shadow:inset 0 0 0 1.5px var(--muted)}
+.day.sel{box-shadow:inset 0 0 0 2px var(--accent);opacity:1}
+.today{box-shadow:inset 0 -2px 0 var(--danger)}
+.pips{display:flex;gap:1.5px;margin-top:1px}
+.pips i{width:5px;height:4px;border-radius:1.5px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto;display:flex;flex-direction:column;gap:14px}
+.phead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.phead h2{margin:0;font-size:17px;font-weight:700}
+.badge{font-size:12px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--tint);white-space:nowrap}
+.badge.soon{background:var(--danger);color:#fff}
+.note{font-size:12px;color:var(--muted);margin-top:2px}
+.prog{height:5px;border-radius:3px;background:var(--tint);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--c-local);width:0}
+.sec{display:flex;flex-direction:column;gap:8px}
+.sec h3{font-size:11.5px;font-weight:600;color:var(--muted);margin:0;letter-spacing:.02em}
+.item{border:1px solid var(--line);border-left:4px solid var(--k);border-radius:8px;padding:9px 11px}
+.item.cond{border-style:dashed;border-left-style:solid}
+.item h4{margin:0;font-size:13.5px;font-weight:600;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.tag{font-size:10.5px;font-weight:600;color:var(--k);border:1px solid var(--k);border-radius:4px;padding:0 5px}
+.meta{font-size:12px;color:var(--muted);margin:2px 0 6px}
+.item label{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;padding:2px 0;cursor:pointer}
+.item input{margin:3px 0 0;accent-color:var(--k);flex:none}
+.item input:checked+span{color:var(--muted);text-decoration:line-through}
+.ups{display:flex;flex-direction:column;gap:4px}
+.up{display:grid;grid-template-columns:64px 44px 1fr;gap:8px;align-items:center;border:0;background:none;color:inherit;font:inherit;font-size:12.5px;text-align:left;padding:5px 6px;border-radius:6px;cursor:pointer}
+.up:hover{background:var(--tint)}
+.up .d{font-weight:600}
+.up .dd{color:var(--muted);font-size:11.5px}
+.up .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.foot{font-size:11.5px;color:var(--muted);max-width:75ch}
+@media (max-width:900px){
+  .main{grid-template-columns:1fr}
+  .panel{position:static;max-height:none}
+  .months{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>(주)강김조 세금 캘린더</h1>
+      <div class="sub">2026년 11월 ~ 2027년 12월 · 12월 결산 법인 · 서울 소재 · 기한은 주말·공휴일을 반영한 실제 마감일</div>
+    </div>
+    <button class="next" id="next" type="button"></button>
+  </header>
+  <div class="legend" id="legend"></div>
+  <div class="main">
+    <div class="months" id="months"></div>
+    <aside class="panel" id="panel" aria-live="polite"></aside>
+  </div>
+  <p class="foot">색이 칠해진 날짜를 누르면 그날 납부할 세금과 준비 항목이 열립니다. 체크 표시는 이 브라우저에만 저장됩니다. 부가가치세는 예정신고(연 4회) 기준이며, 1월과 7월 확정신고 뒤에 다음 예정분 대상 여부를 확인합니다. 점선 항목은 조건에 해당할 때만 발생합니다. 세법 개정과 임시공휴일에 따라 기한이 달라질 수 있으므로 담당 세무사와 대조하시기 바랍니다.</p>
+</div>
+<script>
+const EVENTS=[{"date":"2026-11-10","legal":"2026-11-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"10월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["10월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"10월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"10월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"10월 공급분","where":"홈택스","checks":["10월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"10월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"10월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2026-11-30","legal":"2026-11-30","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"10월 지급분 · 프리랜서 등","where":"홈택스","checks":["10월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"10월 지급분","where":"홈택스","checks":["10월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2026-12-10","legal":"2026-12-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"11월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["11월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"11월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"11월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"11월 공급분","where":"홈택스","checks":["11월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"11월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"11월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2026-12-31","legal":"2026-12-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"11월 지급분 · 프리랜서 등","where":"홈택스","checks":["11월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"11월 지급분","where":"홈택스","checks":["11월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"local","cond":true,"title":"자동차세 2기분 납부","period":"12월 16~31일 고지분","where":"위택스 · 서울 ETAX","checks":["법인 명의 차량 보유 여부 확인","고지서 납부"]}]},{"date":"2027-01-11","legal":"2027-01-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"12월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["12월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"12월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"12월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"12월 공급분","where":"홈택스","checks":["12월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"12월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"12월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-01-25","legal":"2027-01-25","items":[{"cat":"vat","title":"부가가치세 2026년 2기 확정신고·납부","period":"10~12월분 (10월에 예정고지로 냈다면 7~12월분)","where":"홈택스","checks":["플랫폼별 정산서·세금계산서·카드·현금영수증 매출 집계","매입 세금계산서·법인카드 내역 확인","신고서 제출","납부 완료"]},{"cat":"check","title":"4월 예정분 대상 여부 확인","period":"이번 확정신고 직후","where":"홈택스 신고내역","checks":["이번 확정신고서의 과세기간(6개월) 공급가액 합계 확인","1억 5천만 원 이상이면 4월에 예정신고·납부","1억 5천만 원 미만이면 4월 초 예정고지서 금액만 납부"]}]},{"date":"2027-02-01","legal":"2027-01-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"12월 지급분 · 프리랜서 등","where":"홈택스","checks":["12월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"12월 지급분","where":"홈택스","checks":["12월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"report","title":"간이지급명세서 제출 (근로소득)","period":"2026년 7~12월 지급분","where":"홈택스","checks":["하반기 직원별 급여·상여 지급액 집계","제출 완료"]},{"cat":"local","cond":true,"title":"등록면허세(면허분) 납부","period":"1월 16~31일 고지분","where":"위택스 · 서울 ETAX","checks":["통신판매업 등 보유 면허의 고지서 수령 여부 확인","납부 완료"]}]},{"date":"2027-02-10","legal":"2027-02-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"1월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["1월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"1월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"1월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"1월 공급분","where":"홈택스","checks":["1월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"1월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"1월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-03-02","legal":"2027-02-28","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"1월 지급분 · 프리랜서 등","where":"홈택스","checks":["1월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"1월 지급분","where":"홈택스","checks":["1월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"report","cond":true,"title":"지급명세서 제출 (이자·배당·기타소득)","period":"2026년 지급분","where":"홈택스","checks":["2026년에 이자·배당·기타소득을 지급했는지 확인","지급한 경우 제출"]}]},{"date":"2027-03-10","legal":"2027-03-10","items":[{"cat":"wht","title":"원천세 신고·납부 (연말정산분 포함)","period":"2월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["2월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료","2026년 귀속 연말정산 결과를 2월분 신고서에 반영"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"2월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"2월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"2월 공급분","where":"홈택스","checks":["2월 공급분 미발급 건 확인","발급 완료"]},{"cat":"report","title":"근로·사업·퇴직소득 지급명세서 제출","period":"2026년 귀속(연말정산 결과)","where":"홈택스","checks":["직원별 연말정산 결과가 2월 급여에 반영되었는지 확인","근로소득 지급명세서 제출","사업소득(프리랜서)·퇴직소득 지급명세서 제출"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"2월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"2월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-03-31","legal":"2027-03-31","items":[{"cat":"corp","title":"법인세 확정신고·납부","period":"2026 사업연도(1~12월)","where":"홈택스","checks":["결산 확정(정기 주주총회 승인)","재무제표·세무조정계산서 준비","주식등변동상황명세서 제출","납부세액 1천만 원 초과 시 분납 여부 결정","신고·납부 완료"]},{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"2월 지급분 · 프리랜서 등","where":"홈택스","checks":["2월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"2월 지급분","where":"홈택스","checks":["2월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2027-04-12","legal":"2027-04-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"3월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["3월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"3월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"3월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"3월 공급분","where":"홈택스","checks":["3월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"3월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"3월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-04-26","legal":"2027-04-25","items":[{"cat":"vat","title":"부가가치세 2027년 1기 예정신고·납부","period":"1~3월분","where":"홈택스","checks":["1월에 확인한 대상 구분(예정신고 / 예정고지) 재확인","플랫폼별 정산서·세금계산서·카드·현금영수증 매출 집계","매입 세금계산서·법인카드 내역 확인","신고서 제출","납부 완료"]}]},{"date":"2027-04-30","legal":"2027-04-30","items":[{"cat":"local","title":"법인지방소득세 신고·납부","period":"2026 사업연도","where":"위택스","checks":["법인세 신고서의 과세표준과 대조","재무제표 등 첨부서류 제출","납부 완료"]},{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"3월 지급분 · 프리랜서 등","where":"홈택스","checks":["3월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"3월 지급분","where":"홈택스","checks":["3월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2027-05-10","legal":"2027-05-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"4월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["4월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"4월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"4월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"4월 공급분","where":"홈택스","checks":["4월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"4월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"4월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-05-31","legal":"2027-05-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"4월 지급분 · 프리랜서 등","where":"홈택스","checks":["4월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"4월 지급분","where":"홈택스","checks":["4월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"corp","cond":true,"title":"법인세 분납분 납부","period":"3월에 분납을 신청한 경우(중소기업 2개월 이내)","where":"홈택스","checks":["3월 신고 때 분납을 선택했는지 확인","분납 잔액 납부"]}]},{"date":"2027-06-10","legal":"2027-06-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"5월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["5월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"5월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"5월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"5월 공급분","where":"홈택스","checks":["5월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"5월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"5월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-06-30","legal":"2027-06-30","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"5월 지급분 · 프리랜서 등","where":"홈택스","checks":["5월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"5월 지급분","where":"홈택스","checks":["5월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"local","cond":true,"title":"자동차세 1기분 납부","period":"6월 16~30일 고지분","where":"위택스 · 서울 ETAX","checks":["법인 명의 차량 보유 여부 확인","고지서 납부"]}]},{"date":"2027-07-12","legal":"2027-07-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"6월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["6월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"6월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"6월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"6월 공급분","where":"홈택스","checks":["6월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"6월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"6월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-07-26","legal":"2027-07-25","items":[{"cat":"vat","title":"부가가치세 2027년 1기 확정신고·납부","period":"4~6월분 (4월에 예정고지로 냈다면 1~6월분)","where":"홈택스","checks":["플랫폼별 정산서·세금계산서·카드·현금영수증 매출 집계","매입 세금계산서·법인카드 내역 확인","신고서 제출","납부 완료"]},{"cat":"check","title":"10월 예정분 대상 여부 확인","period":"이번 확정신고 직후","where":"홈택스 신고내역","checks":["이번 확정신고서의 과세기간(6개월) 공급가액 합계 확인","1억 5천만 원 이상이면 10월에 예정신고·납부","1억 5천만 원 미만이면 10월 초 예정고지서 금액만 납부"]}]},{"date":"2027-08-02","legal":"2027-07-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"6월 지급분 · 프리랜서 등","where":"홈택스","checks":["6월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"6월 지급분","where":"홈택스","checks":["6월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"report","title":"간이지급명세서 제출 (근로소득)","period":"2027년 1~6월 지급분","where":"홈택스","checks":["상반기 직원별 급여·상여 지급액 집계","제출 완료","참고: 2027년 지급분부터 법률상 매월 제출이며, 2027년은 반기 제출도 가산세 없음"]},{"cat":"local","cond":true,"title":"재산세 1기분 납부 (건물)","period":"7월 16~31일 고지분","where":"위택스 · 서울 ETAX","checks":["법인 명의 부동산 보유 여부 확인","고지서 납부"]}]},{"date":"2027-08-10","legal":"2027-08-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"7월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["7월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"7월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"7월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"7월 공급분","where":"홈택스","checks":["7월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"7월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"7월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-08-31","legal":"2027-08-31","items":[{"cat":"corp","title":"법인세 중간예납","period":"2027년 1~6월분","where":"홈택스","checks":["직전 연도 실적 기준과 상반기 가결산 기준 중 선택","면제 대상 여부 확인(중소기업·기준 계산액 50만 원 미만)","신고·납부 완료"]},{"cat":"local","title":"주민세 사업소분 신고·납부","period":"과세기준일 7월 1일 · 8월 1일부터 납부 가능","where":"위택스 · 서울 ETAX","checks":["7월 1일 기준 사업소 연면적 확인(330㎡ 초과 시 연면적분 추가)","자본금 구간별 기본세액 확인","신고·납부 완료"]},{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"7월 지급분 · 프리랜서 등","where":"홈택스","checks":["7월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"7월 지급분","where":"홈택스","checks":["7월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2027-09-10","legal":"2027-09-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"8월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["8월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"8월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"8월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"8월 공급분","where":"홈택스","checks":["8월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"8월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"8월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-09-30","legal":"2027-09-30","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"8월 지급분 · 프리랜서 등","where":"홈택스","checks":["8월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"8월 지급분","where":"홈택스","checks":["8월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"local","cond":true,"title":"재산세 2기분 납부 (토지)","period":"9월 16~30일 고지분","where":"위택스 · 서울 ETAX","checks":["법인 명의 부동산 보유 여부 확인","고지서 납부"]}]},{"date":"2027-10-12","legal":"2027-10-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"9월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["9월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"9월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"9월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"9월 공급분","where":"홈택스","checks":["9월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"9월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"9월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-10-25","legal":"2027-10-25","items":[{"cat":"vat","title":"부가가치세 2027년 2기 예정신고·납부","period":"7~9월분","where":"홈택스","checks":["7월에 확인한 대상 구분(예정신고 / 예정고지) 재확인","플랫폼별 정산서·세금계산서·카드·현금영수증 매출 집계","매입 세금계산서·법인카드 내역 확인","신고서 제출","납부 완료"]}]},{"date":"2027-11-01","legal":"2027-10-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"9월 지급분 · 프리랜서 등","where":"홈택스","checks":["9월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"9월 지급분","where":"홈택스","checks":["9월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2027-11-10","legal":"2027-11-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"10월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["10월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"10월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"10월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"10월 공급분","where":"홈택스","checks":["10월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"10월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"10월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-11-30","legal":"2027-11-30","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"10월 지급분 · 프리랜서 등","where":"홈택스","checks":["10월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"10월 지급분","where":"홈택스","checks":["10월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]}]},{"date":"2027-12-10","legal":"2027-12-10","items":[{"cat":"wht","title":"원천세 신고·납부","period":"11월 지급분 · 근로·사업(3.3%)·일용소득","where":"홈택스","checks":["11월 급여대장 마감(정직원)","프리랜서 3.3%·일용직 지급 내역 취합","원천징수이행상황신고서 제출","납부 완료"]},{"cat":"local","title":"지방소득세 특별징수분 신고·납부","period":"11월 지급분 · 원천세액의 10%","where":"위택스 (서울 ETAX 납부 가능)","checks":["원천세 신고서의 세액과 10% 금액 대조","위택스 신고·납부 완료"]},{"cat":"etc","title":"4대 보험료 납부","period":"11월분","where":"4대사회보험 정보연계센터 · 자동이체","checks":["고지 금액 확인(입·퇴사자 반영 여부)","납부 완료"]},{"cat":"report","title":"전자세금계산서 발급 마감","period":"11월 공급분","where":"홈택스","checks":["11월 공급분 미발급 건 확인","발급 완료"]},{"cat":"local","cond":true,"title":"주민세 종업원분","period":"11월 급여총액의 0.5%","where":"위택스","checks":["최근 1년 월평균 급여총액이 1억 8천만 원을 넘는지 확인","초과 시에만 신고·납부"]},{"cat":"etc","cond":true,"title":"인지세 납부","period":"11월 작성 문서","where":"홈택스(전자수입인지)","checks":["도급·용역계약서 등 과세문서를 작성했는지 확인","작성한 경우 전자수입인지 구매·첨부"]}]},{"date":"2027-12-31","legal":"2027-12-31","items":[{"cat":"report","title":"간이지급명세서 제출 (사업·기타소득)","period":"11월 지급분 · 프리랜서 등","where":"홈택스","checks":["11월 프리랜서·강연료 등 지급 건 명단과 금액 확인","제출 완료"]},{"cat":"report","title":"일용근로소득 지급명세서 제출","period":"11월 지급분","where":"홈택스","checks":["11월 일용직 지급 건 확인(팝업 단기 인력 포함)","제출 완료"]},{"cat":"local","cond":true,"title":"자동차세 2기분 납부","period":"12월 16~31일 고지분","where":"위택스 · 서울 ETAX","checks":["법인 명의 차량 보유 여부 확인","고지서 납부"]}]}];
+const HOL=new Set(["2026-12-25","2027-01-01","2027-02-06","2027-02-07","2027-02-08","2027-02-09","2027-03-01","2027-05-01","2027-05-05","2027-05-13","2027-06-06","2027-08-15","2027-08-16","2027-09-14","2027-09-15","2027-09-16","2027-10-03","2027-10-04","2027-10-09","2027-10-11","2027-12-25","2027-12-27"]);
+const CATS={vat:['부가가치세','--c-vat'],corp:['법인세','--c-corp'],wht:['원천세','--c-wht'],local:['지방세','--c-local'],etc:['4대 보험·인지세','--c-etc'],report:['명세서·계산서 제출','--c-report'],check:['대상 여부 확인','--c-check']};
+const PAY=['vat','corp','wht','local','etc'];
+const DOW='일월화수목금토';
+const byDate={};EVENTS.forEach(e=>byDate[e.date]=e);
+const pad=n=>String(n).padStart(2,'0');
+const key=(y,m,d)=>y+'-'+pad(m)+'-'+pad(d);
+const now=new Date();const TODAY=key(now.getFullYear(),now.getMonth()+1,now.getDate());
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d);};
+const diff=s=>Math.round((parse(s)-parse(TODAY))/864e5);
+const dlabel=n=>n===0?'D-DAY':n>0?'D-'+n:'지남';
+const long=s=>{const d=parse(s);return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${DOW[d.getDay()]})`;};
+const short=s=>{const d=parse(s);return `${d.getMonth()+1}/${d.getDate()}(${DOW[d.getDay()]})`;};
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let store={};try{store=JSON.parse(localStorage.getItem('kkj-tax-checks')||'{}');}catch(e){}
+const save=()=>{try{localStorage.setItem('kkj-tax-checks',JSON.stringify(store));}catch(e){}};
+const upcoming=EVENTS.filter(e=>e.date>=TODAY);
+let selected=(upcoming[0]||EVENTS[EVENTS.length-1]).date;
+
+document.getElementById('legend').innerHTML=Object.values(CATS).map(([n,v])=>`<span><i style="background:var(${v})"></i>${n}</span>`).join('')+'<span><i class="dash"></i>해당 시에만</span>';
+
+function catsOf(e){return [...new Set(e.items.filter(i=>!i.cond).map(i=>i.cat))];}
+function renderMonths(){
+  const out=[];
+  for(let y=2026,m=11;!(y===2028&&m===1);){
+    const first=new Date(y,m-1,1).getDay(),last=new Date(y,m,0).getDate();
+    let cnt=0,cells='';
+    for(const c of DOW)cells+=`<div class="dow">${c}</div>`;
+    for(let i=0;i<first;i++)cells+='<div class="cell"></div>';
+    for(let d=1;d<=last;d++){
+      const k=key(y,m,d),e=byDate[k],dw=new Date(y,m-1,d).getDay();
+      const cls=(k<TODAY?' past':'')+(k===TODAY?' today':'');
+      if(e){cnt++;
+        const pips=catsOf(e).map(c=>`<i style="background:var(${CATS[c][1]})"></i>`).join('');
+        cells+=`<button type="button" class="day${cls}${k===selected?' sel':''}" data-d="${k}" aria-label="${long(k)} 기한 ${e.items.length}건">${d}<span class="pips">${pips}</span></button>`;
+      }else cells+=`<div class="cell${cls}${(dw===0||dw===6||HOL.has(k))?' off':''}">${d}</div>`;
+    }
+    out.push(`<section class="month"><h2>${y}년 ${m}월<small>기한 ${cnt}일</small></h2><div class="grid">${cells}</div></section>`);
+    m++;if(m>12){m=1;y++;}
+  }
+  document.getElementById('months').innerHTML=out.join('');
+}
+function itemHtml(e,it,idx){
+  const v=CATS[it.cat][1];
+  const checks=it.checks.map((c,j)=>{const id=`c-${e.date}-${idx}-${j}`;
+    return `<label for="${id}"><input type="checkbox" id="${id}" data-k="${e.date}|${it.title}|${j}"${store[e.date+'|'+it.title+'|'+j]?' checked':''}><span>${esc(c)}</span></label>`;}).join('');
+  return `<div class="item${it.cond?' cond':''}" style="--k:var(${v})"><h4>${esc(it.title)}<span class="tag">${CATS[it.cat][0]}</span></h4><div class="meta">${esc(it.period)} · ${esc(it.where)}</div>${checks}</div>`;
+}
+function renderPanel(){
+  const e=byDate[selected],n=diff(selected);
+  const idx=it=>e.items.indexOf(it);
+  const pay=e.items.filter(i=>!i.cond&&PAY.includes(i.cat)),rep=e.items.filter(i=>!i.cond&&!PAY.includes(i.cat)),cond=e.items.filter(i=>i.cond);
+  const sec=(t,a)=>a.length?`<div class="sec"><h3>${t} · ${a.length}건</h3>${a.map(i=>itemHtml(e,i,idx(i))).join('')}</div>`:'';
+  const moved=e.legal!==e.date?`<div class="note">법정 기한 ${short(e.legal)}이 휴일이라 다음 영업일로 순연되었습니다.</div>`:'';
+  const ups=upcoming.filter(u=>u.date!==selected).slice(0,6).map(u=>{
+    const pips=catsOf(u).map(c=>`<i style="background:var(${CATS[c][1]})"></i>`).join('');
+    const main=u.items.filter(i=>!i.cond&&i.cat!=='etc'&&i.cat!=='report');
+    const t=(main.length?main:u.items).slice(0,3).map(i=>i.title.replace(' 신고·납부','')).join(', ');
+    return `<button type="button" class="up" data-d="${u.date}"><span class="d">${short(u.date)}</span><span class="dd">${dlabel(diff(u.date))}</span><span class="t"><span class="pips" style="display:inline-flex;margin-right:6px">${pips}</span>${esc(t)}</span></button>`;}).join('');
+  document.getElementById('panel').innerHTML=
+    `<div><div class="phead"><h2>${long(selected)}</h2><span class="badge${n>=0&&n<=3?' soon':''}">${dlabel(n)}</span></div>${moved}<div class="note" id="pcount"></div></div>
+     <div class="prog"><i id="pbar"></i></div>
+     ${sec('납부할 세금',pay)}${sec('제출·확인할 항목',rep)}${sec('해당하는 경우만',cond)}
+     <div class="sec"><h3>다가오는 기한</h3><div class="ups">${ups||'<span class="note">남은 기한이 없습니다.</span>'}</div></div>`;
+  progress();
+}
+function progress(){
+  const boxes=[...document.querySelectorAll('#panel .item:not(.cond) input')];
+  const done=boxes.filter(b=>b.checked).length;
+  document.getElementById('pcount').textContent=`준비 항목 ${done}/${boxes.length} 완료`;
+  document.getElementById('pbar').style.width=(boxes.length?done/boxes.length*100:0)+'%';
+}
+function renderNext(){
+  const u=upcoming[0],b=document.getElementById('next');
+  if(!u){b.innerHTML='<span>남은 기한 없음</span>';return;}
+  b.dataset.d=u.date;
+  b.innerHTML=`<b>${dlabel(diff(u.date))}</b><div>다음 기한 ${short(u.date)}<span>${u.items.filter(i=>!i.cond).length}건 · ${catsOf(u).map(c=>CATS[c][0]).join(', ')}</span></div>`;
+}
+function select(d,scroll){
+  selected=d;
+  document.querySelectorAll('.day.sel').forEach(x=>x.classList.remove('sel'));
+  const el=document.querySelector(`.day[data-d="${d}"]`);if(el)el.classList.add('sel');
+  renderPanel();
+  if(scroll&&window.matchMedia('(max-width:900px)').matches)document.getElementById('panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+document.addEventListener('click',ev=>{const t=ev.target.closest('[data-d]');if(t)select(t.dataset.d,true);});
+document.addEventListener('change',ev=>{const k=ev.target.dataset&&ev.target.dataset.k;if(!k)return;if(ev.target.checked)store[k]=1;else delete store[k];save();progress();});
+renderMonths();renderNext();renderPanel();
+</script>
+</body>
+</html>
