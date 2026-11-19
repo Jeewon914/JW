@@ -215,7 +215,7 @@ input[type=checkbox]{width:auto}
   <section class="best" id="bestPanel">
     <div class="k" id="bestTitle">오늘 기준 카테고리별 최저가 플랫폼</div>
     <div class="best-grid" id="bestGrid"></div>
-    <p class="hint">신청 할인율 + 플랫폼 쿠폰을 복합 적용한 체감 할인율 기준(상품할인 × 쿠폰). 랜덤 쿠폰·미확정(선정 전) 행사·특정 SKU만 해당하는 조건은 제외했고, 1%p 이내 차이는 공동으로 표시합니다.</p>
+    <p class="hint">"실측" 표시는 해당 날짜에 플랫폼 브랜드 페이지에서 확인한 노출 할인율, "시트 기준"은 세일시트 신청값 + 쿠폰 계산값입니다. 랜덤 쿠폰·미확정(선정 전) 행사·특정 SKU만 해당하는 조건은 제외했고, 1%p 이내 차이는 공동으로 표시합니다.</p>
   </section>
 
   <section class="controls">
@@ -305,6 +305,7 @@ input[type=checkbox]{width:auto}
       var seen={}; winners.forEach(function(e){ if(seen[e.platform]) return; seen[e.platform]=1;
         var pl=document.createElement("span"); pl.className="pl"; pl.style.setProperty("--pc",pc(e.platform)); pl.textContent=e.platform; row.appendChild(pl); });
       var rate=document.createElement("span"); rate.className="rate"; rate.textContent="≈"+top+"%"; row.appendChild(rate);
+      var vb=document.createElement("span"); vb.className="badge"+(winners[0].verified?" ok":""); vb.textContent=winners[0].verified?"실측 "+winners[0].verified.slice(5).replace("-","/"):"시트 기준"; row.appendChild(vb);
       var ev=document.createElement("button"); ev.type="button"; ev.className="ev"; ev.textContent=winners.map(function(e){return e.name;}).join(" · "); ev.title="행사 상세 보기"; ev.addEventListener("click",function(){ show(winners[0]); }); row.appendChild(ev);
       grid.appendChild(row);
     });
@@ -398,6 +399,7 @@ input[type=checkbox]{width:auto}
       (e.cond?'<div class="full"><div class="k">조건</div><div class="v">'+esc(e.cond)+'</div></div>':"")+
       (cats?'<div class="full"><div class="k">카테고리별 할인율</div><div class="catgrid">'+cats+'</div></div>':"")+
       (e.memo?'<div class="full"><div class="k">메모</div><div class="v">'+esc(e.memo)+'</div></div>':"")+
+      (e.verified?'<div class="full"><div class="k">플랫폼 실측</div><div class="v"><span class="badge ok">실측 '+esc(e.verified)+'</span> '+esc(e.verifiedNote||"")+'</div></div>':"")+
       (e.best&&Object.keys(e.best).length?'<div class="full"><div class="k">최저가 비교용 체감 할인율 (상품할인 × 쿠폰)</div><div class="catgrid">'+GROUPS.filter(function(g){return typeof e.best[g[0]]==="number";}).map(function(g){return '<div><span>'+esc(g[1])+'</span><b>≈'+e.best[g[0]]+'%</b></div>';}).join("")+'</div></div>':"")+
       '<div class="full actions" id="detActions"></div>';
     var act=$("detActions");
