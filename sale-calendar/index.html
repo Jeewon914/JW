@@ -95,6 +95,17 @@ button[disabled]{opacity:.5;cursor:default}
 .best-row .ev:hover{text-decoration:underline}
 .best-row .none{color:var(--muted);font-size:12.5px}
 .best .hint{margin-top:8px}
+@media (max-width:640px){
+  .best{padding:12px 12px}
+  .best-grid{grid-template-columns:1fr;gap:0}
+  .best-row{flex-wrap:wrap;gap:4px 8px;padding:8px 0}
+  .best-row .cat{width:auto;flex:1 1 auto;font-size:13px}
+  .best-row .cat .sub{display:none}
+  .best-row .pl{font-size:12px;padding:2px 8px}
+  .best-row .rate{font-size:13px}
+  .best-row .badge{flex:none}
+  .best-row .ev,.best-row .none{flex:0 0 100%;width:100%;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+}
 /* controls */
 .controls{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
 .controls .month{display:flex;align-items:center;gap:6px}
@@ -299,7 +310,7 @@ input[type=checkbox]{width:auto}
     GROUPS.forEach(function(g){
       var key=g[0]; var cands=live.filter(function(e){ return typeof e.best[key]==="number"; }).sort(function(a,b){ return b.best[key]-a.best[key]; });
       var row=document.createElement("div"); row.className="best-row";
-      var cat=document.createElement("span"); cat.className="cat"; cat.textContent=g[1]; row.appendChild(cat);
+      var cat=document.createElement("span"); cat.className="cat"; var cm=/^(.*?)\s*(\(.*\))?$/.exec(g[1]); cat.textContent=cm[1]; if(cm[2]){ var sub=document.createElement("span"); sub.className="sub"; sub.textContent=" "+cm[2]; cat.appendChild(sub); } row.appendChild(cat);
       if(!cands.length){ var n=document.createElement("span"); n.className="none"; n.textContent="진행 중 행사 없음"; row.appendChild(n); grid.appendChild(row); return; }
       var top=cands[0].best[key]; var winners=cands.filter(function(e){ return top-e.best[key]<1; });
       var seen={}; winners.forEach(function(e){ if(seen[e.platform]) return; seen[e.platform]=1;
