@@ -43,6 +43,13 @@
   .tabs button small{font-weight:600;opacity:.7;margin-left:4px}
   .bh{font-size:17px;font-weight:800;margin:26px 0 2px;padding-top:14px;border-top:2px solid var(--ink);letter-spacing:-.01em}
   .bh small{font-size:12px;font-weight:600;color:var(--sub);margin-left:6px}
+  .st{display:inline-block;border-radius:6px;padding:1px 7px;font-size:11px;font-weight:700;margin-right:6px;vertical-align:1px}
+  .st.me{background:var(--red);color:#fff} .st.them{background:var(--chip);color:var(--sub)} .st.check{background:var(--amber);color:#fff}
+  .fu{display:block} .fu .title{font-weight:650} .fu .sub{margin-top:4px}
+  .inf{display:block} .inf .kv{margin-top:8px;font-size:14px} .inf .kv b{display:inline-block;min-width:44px;color:var(--sub);font-weight:600;font-size:12px}
+  .inf ul{margin:4px 0 0;padding-left:18px;font-size:14px} .inf .next{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:13px}
+  .choice label.ret.on{border-color:var(--sub);color:var(--ink);background:var(--chip)}
+  .sp.returned{opacity:.6}
   .stale{background:var(--red);color:#fff;border-radius:10px;padding:10px 14px;font-size:14px;margin-bottom:16px;display:none}
 </style>
 </head>
@@ -53,8 +60,9 @@
   <div class="stale" id="stale"></div>
   <div class="tabs" id="tabs"></div>
   <div id="brands"></div>
-  <h2>연예인 협찬 문의</h2><div class="hint">협찬하실 건은 GO, 하지 않을 건은 NO를 눌러 주십시오. 선택은 이 기기에 저장됩니다.</div><div id="sp-inbox"></div>
-  <h2>협찬 진행 일정 (GO)</h2><div id="sp-go"></div>
+  <h2>인플루언서 협업</h2><div id="inf"></div>
+  <h2>연예인 협찬 문의</h2><div class="hint">협찬하실 건은 GO, 하지 않을 건은 NO, 제품을 회수하면 RETURN을 눌러 주십시오. 선택은 이 기기에 저장됩니다.</div><div id="sp-inbox"></div>
+  <h2>협찬 진행 일정 (GO · RETURN)</h2><div id="sp-go"></div>
 </main>
 <script>
 const WD=['일','월','화','수','목','금','토'];
@@ -78,6 +86,9 @@ function section(d,key){
   const E=(d.events||[]).filter(e=>bOf(e)===key&&new Date(e.end)>now).sort((a,b)=>new Date(a.start)-new Date(b.start));
   let h='';
   h+='<h2>회신·제출 기한</h2>'+(R.length?R.map(r=>card(r.dd,r.platform,r.title,(r.due?`${fmt(r.due)}까지`:'기한 없음')+(r.note&&r.due?` · ${r.note}`:(!r.due&&r.note&&r.note!=='기한 없음'?` · ${r.note}`:'')))).join(''):'<div class="empty">회신할 메일이 없습니다.</div>');
+  const SL={me:'내 차례',them:'상대 회신 대기',check:'확인 필요'},SO={me:0,check:1,them:2};
+  const F=(d.followups||[]).filter(f=>bOf(f)===key).sort((a,b)=>(SO[a.state]??3)-(SO[b.state]??3));
+  if(F.length)h+='<h2>팔로우업 (아직 끝나지 않은 건)</h2>'+F.map(f=>`<div class="card fu"><div class="title"><span class="st ${esc(f.state)}">${SL[f.state]||''}</span>${f.platform?`<span class="chip">${esc(f.platform)}</span>`:''}${esc(f.title)}</div><div class="sub">${esc(f.note||'')}</div></div>`).join('');
   if(M.length)h+='<h2>미팅 일정</h2>'+M.map(m=>card(m.dd,m.kind,m.title,fmt(m.when))).join('');
   if(E.length)h+='<h2>기획전 일정</h2>'+E.map(e=>{const on=new Date(e.start)<=now;const dd=on?{label:'진행 중',cls:'later'}:dday(e.start);return card(dd,e.platform,e.title,`${fmt(e.start)} ~ ${fmt(e.end)}`)}).join('');
   return {html:h,count:R.length,empty:!R.length&&!M.length&&!E.length};
@@ -98,6 +109,11 @@ function render(d){
   if((Date.now()-up)/36e5>26){const s=document.getElementById('stale');s.style.display='block';s.textContent='24시간 넘게 갱신되지 않았습니다. PC에서 수집을 요청해 주십시오.'}
   draw();
   SP=d.sponsorships||[];spRender();
+  const I=d.influencers||[],SL2={me:'내 차례',them:'상대 회신 대기',check:'확인 필요',done:'완료'};
+  document.getElementById('inf').innerHTML=I.length?I.map(x=>`<div class="card inf"><div class="title"><span class="chip">${x.brand==='cx'?'챕터엑스':'로맨티누어'}</span>${esc(x.name)} <span class="st ${esc(x.state)}">${SL2[x.state]||''}</span></div>
+  <div class="kv"><b>형식</b>${esc(x.format||'')}</div><div class="kv"><b>방향</b>${esc(x.direction||'')}</div>
+  <div class="kv"><b>제품</b></div><ul>${(x.products||[]).map(p=>`<li>${esc(p)}</li>`).join('')}</ul>
+  ${x.schedule?`<div class="kv"><b>일정</b>${esc(x.schedule)}</div>`:''}<div class="next"><b>다음 할 일</b> ${esc(x.next||'')}</div></div>`).join(''):'<div class="empty">진행 중인 인플루언서 협업이 없습니다.</div>';
 }
 const SPK='mailDday.sponsor.v1';
 const spLoad=()=>{try{return JSON.parse(localStorage.getItem(SPK)||'{}')||{}}catch(e){return {}}};
@@ -111,27 +127,27 @@ function spMerged(){
   const st=spLoad(),map={};
   SP.forEach(x=>{map[x.id]={...x}});
   Object.keys(st).forEach(id=>{const e=st[id];if(!e)return;
-    if(map[id]){map[id].decision=e.decision}else if(e.decision==='go'&&e.item){map[id]={...e.item,decision:'go'}}});
+    if(map[id]){const dd=map[id].decision||'';if(e.base===undefined?(!dd||dd===e.decision||dd==='go'&&e.decision!=='go'&&false):e.base===dd)map[id].decision=e.decision}else if((e.decision==='go'||e.decision==='return')&&e.item){map[id]={...e.item,decision:'go'}}});
   return Object.values(map).filter(x=>!x.return||dayDiff(x.return)>=-7)
     .sort((a,b)=>(a.pickup||'').localeCompare(b.pickup||''));
 }
 function spCard(x){
   const d=x.decision||'',n=x.pickup?dayDiff(x.pickup):99;
-  const cls=d==='no'?'declined none':(x.return&&dayDiff(x.return)<0)?'past':n<=1?'urgent':n<=7?'soon':'later';
-  const head=x.pickup&&dayDiff(x.pickup)>=0?{l:ddLabel(x.pickup),s:'픽업'}:x.return?{l:ddLabel(x.return),s:'반납'}:{l:'—',s:''};
+  const cls=d==='return'?'returned none':d==='no'?'declined none':(x.return&&dayDiff(x.return)<0)?'past':n<=1?'urgent':n<=7?'soon':'later';
+  const head=d==='return'?{l:'회수',s:'완료'}:x.pickup&&dayDiff(x.pickup)>=0?{l:ddLabel(x.pickup),s:'픽업'}:x.return?{l:ddLabel(x.return),s:'반납'}:{l:'—',s:''};
   const sched=x.schedule_start?`<span class="date"><b>일정</b>${md(x.schedule_start)}${x.schedule_end?' ~ '+md(x.schedule_end):''}</span>`:'';
   return `<div class="card sp ${cls}"><div class="row"><div class="dd">${head.l}<small>${head.s}</small></div><div class="body"><div class="title"><span class="chip">${x.brand==='cx'?'챕터엑스':'로맨티누어'}</span>${esc(x.title)}</div>
   <div class="dates"><span class="date"><b>픽업</b>${x.pickup?md(x.pickup):'미정'}</span>${sched}<span class="date"><b>반납</b>${x.return?md(x.return):'미정'}</span></div></div></div>
-  <div class="choice"><label class="go ${d==='go'?'on':''}"><input type="checkbox" data-id="${esc(x.id)}" data-v="go" ${d==='go'?'checked':''}>GO</label><label class="no ${d==='no'?'on':''}"><input type="checkbox" data-id="${esc(x.id)}" data-v="no" ${d==='no'?'checked':''}>NO</label></div></div>`}
+  <div class="choice"><label class="go ${d==='go'?'on':''}"><input type="checkbox" data-id="${esc(x.id)}" data-v="go" ${d==='go'?'checked':''}>GO</label><label class="no ${d==='no'?'on':''}"><input type="checkbox" data-id="${esc(x.id)}" data-v="no" ${d==='no'?'checked':''}>NO</label><label class="ret ${d==='return'?'on':''}"><input type="checkbox" data-id="${esc(x.id)}" data-v="return" ${d==='return'?'checked':''}>RETURN</label></div></div>`}
 function spRender(){
-  const all=spMerged(),go=all.filter(x=>x.decision==='go'),rest=all.filter(x=>x.decision!=='go');
+  const all=spMerged(),go=all.filter(x=>x.decision==='go'||x.decision==='return'),rest=all.filter(x=>x.decision!=='go'&&x.decision!=='return');
   document.getElementById('sp-inbox').innerHTML=rest.length?rest.map(spCard).join(''):'<div class="empty">검토할 협찬 문의가 없습니다.</div>';
   document.getElementById('sp-go').innerHTML=go.length?go.map(spCard).join(''):'<div class="empty">진행 중인 협찬이 없습니다.</div>';
 }
 document.addEventListener('change',e=>{const t=e.target;if(!t.dataset||!t.dataset.id)return;
   const id=t.dataset.id,v=t.checked?t.dataset.v:'',st=spLoad(),item=spMerged().find(x=>x.id===id);
   const copy=item?{...item}:null;if(copy)delete copy.decision;
-  st[id]={decision:v,item:copy};spSave(st);spRender()});
+  const base=(SP.find(x=>x.id===id)||{}).decision||'';st[id]={decision:v,item:copy,base};spSave(st);spRender()});
 const RAW='https://raw.githubusercontent.com/Jeewon914/JW/mail-dday-data/mail-dday/data.json';
 const get=u=>fetch(u+'?t='+Date.now(),{cache:'no-store'}).then(r=>{if(!r.ok)throw 0;return r.json()});
 get(RAW).catch(()=>get('data.json')).then(render).catch(()=>{document.getElementById('meta').textContent='데이터를 불러오지 못했습니다.'});
