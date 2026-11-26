@@ -98,6 +98,13 @@
       "title": "얼리시즌오프 2차 취합",
       "due": "2026-12-11T17:00:00+09:00",
       "note": "엑셀 회신"
+    },
+    {
+      "brand": "etc",
+      "platform": "세무",
+      "title": "3분기 거래처원장 확인·회신",
+      "due": "2026-11-30T23:59:00+09:00",
+      "note": "메일 회신"
     }
   ],
   "followups": [
@@ -170,6 +177,20 @@
       "platform": "인플루언서",
       "title": "sarada 구성·제품 선택 회신 대기",
       "note": "11/26 구성안 발송"
+    },
+    {
+      "brand": "rom",
+      "state": "them",
+      "platform": "시딩",
+      "title": "FASHION HAKYO 촬영 날짜 공유 대기",
+      "note": "11/26 협찬 제품 택배 발송 · 수령 후 촬영 날짜 공유 예정"
+    },
+    {
+      "brand": "rom",
+      "state": "me",
+      "platform": "시딩",
+      "title": "FASHION HAKYO 댓글 이벤트 당첨 3인 선물 발송",
+      "note": "콘텐츠 업로드·추첨 이후 진행"
     }
   ],
   "influencers": [
