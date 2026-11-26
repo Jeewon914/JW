@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-26T19:50:00+09:00",
+  "updated": "2026-11-26T19:55:00+09:00",
   "replies": [
     {
       "brand": "rom",
@@ -156,9 +156,50 @@
       "platform": "팝업",
       "title": "위크앤드 연말 브랜드 팝업 제안 검토",
       "note": "11/25 수신 · 답장 기록 없음 · 대상 브랜드 미정"
+    },
+    {
+      "brand": "rom",
+      "state": "me",
+      "platform": "인플루언서",
+      "title": "YEONU 제품 출고 일정 안내",
+      "note": "11/27 출고 가능 여부 확인 후 안내"
+    },
+    {
+      "brand": "rom",
+      "state": "them",
+      "platform": "인플루언서",
+      "title": "sarada 구성·제품 선택 회신 대기",
+      "note": "11/26 구성안 발송"
     }
   ],
-  "influencers": [],
+  "influencers": [
+    {
+      "id": "inf-yeonu",
+      "brand": "rom",
+      "name": "YEONU",
+      "state": "me",
+      "format": "피드",
+      "direction": "비니 2종 · 피드",
+      "products": [
+        "비니 2종"
+      ],
+      "schedule": "출고 11/27 예정 (늦으면 11/30)",
+      "next": "출고 일정 안내 → 출고 → 업로드 확인"
+    },
+    {
+      "id": "inf-sarada",
+      "brand": "rom",
+      "name": "sarada",
+      "state": "them",
+      "format": "릴스",
+      "direction": "비니 (종수 미정) · 릴스",
+      "products": [
+        "비니 선택 대기"
+      ],
+      "schedule": "미정",
+      "next": "구성·제품 선택 회신 대기"
+    }
+  ],
   "meetings": [],
   "events": [
     {
