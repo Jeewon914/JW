@@ -1,13 +1,6 @@
 {
-  "updated": "2026-11-26T19:55:00+09:00",
+  "updated": "2026-11-27T12:25:00+09:00",
   "replies": [
-    {
-      "brand": "rom",
-      "platform": "무신사 글로벌",
-      "title": "티몰글로벌 쌍12·크리스마스 행사 참여 신청",
-      "due": "2026-11-27T12:00:00+09:00",
-      "note": "파트너 어드민 신청 · 12% 이상 할인 · 약정서 필수"
-    },
     {
       "brand": "rom",
       "platform": "EQL",
@@ -166,20 +159,6 @@
     },
     {
       "brand": "rom",
-      "state": "me",
-      "platform": "인플루언서",
-      "title": "YEONU 제품 출고 일정 안내",
-      "note": "11/27 출고 가능 여부 확인 후 안내"
-    },
-    {
-      "brand": "rom",
-      "state": "them",
-      "platform": "인플루언서",
-      "title": "sarada 구성·제품 선택 회신 대기",
-      "note": "11/26 구성안 발송"
-    },
-    {
-      "brand": "rom",
       "state": "them",
       "platform": "시딩",
       "title": "FASHION HAKYO 촬영 날짜 공유 대기",
@@ -206,12 +185,13 @@
       "brand": "rom",
       "name": "YEONU",
       "state": "me",
+      "channel": "메일",
       "format": "피드",
-      "direction": "비니 2종 · 피드",
+      "cost": "50만 원",
       "products": [
         "비니 2종"
       ],
-      "schedule": "출고 11/27 예정 (늦으면 11/30)",
+      "schedule": "출고 11/27 예정 (늦으면 11/30) · 업로드는 수령 후 1주 이내",
       "next": "출고 일정 안내 → 출고 → 업로드 확인"
     },
     {
@@ -219,13 +199,45 @@
       "brand": "rom",
       "name": "sarada",
       "state": "them",
+      "channel": "메일",
       "format": "릴스",
-      "direction": "비니 (종수 미정) · 릴스",
+      "cost": "70만 원",
       "products": [
-        "비니 선택 대기"
+        "비니 (선택 대기)"
       ],
       "schedule": "미정",
       "next": "구성·제품 선택 회신 대기"
+    },
+    {
+      "id": "inf-leesoyounz",
+      "brand": "rom",
+      "name": "leesoyounz",
+      "state": "me",
+      "channel": "인스타그램",
+      "format": "릴스",
+      "cost": "20만 원 (2차 활용 별도)",
+      "products": [
+        "플러피 퍼 비니 (그레이)",
+        "부클 로고 비니 (그레이)",
+        "롱 퍼 비니 (블랙)"
+      ],
+      "schedule": "출고 11/30(월) 예정 · 업로드 일정 확인 중",
+      "next": "11/30 출고 → 업로드 일정 확정"
+    },
+    {
+      "id": "inf-yakoreya",
+      "brand": "rom",
+      "name": "yakoreya",
+      "state": "them",
+      "channel": "인스타그램",
+      "format": "릴스",
+      "cost": "무료",
+      "products": [
+        "오프숄더 버튼 부클 가디건 (오트밀)",
+        "부츠컷 데님 팬츠 (M)"
+      ],
+      "schedule": "11/26 출고 완료 · 업로드 일정 확인 중",
+      "next": "업로드 일정 회신 대기"
     }
   ],
   "meetings": [],
@@ -368,6 +380,53 @@
       "return": "2026-11-25",
       "decision": "return",
       "returned_on": "2026-11-26"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "camp-brandazine-offshoulder",
+      "brand": "rom",
+      "name": "브랜더진 캠페인",
+      "channel": "브랜더진 (협업 플랫폼)",
+      "product": "오프숄더 버튼 부클 가디건",
+      "shipped": "11/25~26 전원 출고 완료 (7명)",
+      "members": [
+        {
+          "id": "e_wolly",
+          "color": "베이지",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "hyeanll",
+          "color": "차콜",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "letme.sidan",
+          "color": "차콜",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "lily_yengel",
+          "color": "베이지",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "parkjininn",
+          "color": "베이지",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "onlyxwon",
+          "color": "차콜",
+          "due": "2026-12-10"
+        },
+        {
+          "id": "oneluoes",
+          "color": "베이지",
+          "due": "2026-12-14"
+        }
+      ]
     }
   ]
 }
